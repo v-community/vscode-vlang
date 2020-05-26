@@ -120,7 +120,7 @@ fn (mut file File) process_stmts(stmts []ast.Stmt, parent_idx int) {
 			ast.EnumDecl {
 				file.process_enum(stmt)
 			}
-			else { continue }
+			else {}
 		}
 	}
 }
