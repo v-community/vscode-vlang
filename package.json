@@ -175,7 +175,7 @@
 		"compile": "tsc -p ./",
 		"lint": "npx markdownlint *.md",
 		"test-compile": "tsc -p ./",
-		"vscode:prepublish": "./minify_json.js && webpack --mode production",
+		"vscode:prepublish": "node ./minify_json.js && webpack --mode production",
 		"compile-vsymbols": "v ./src/vsymbols ./bin/vsymbols",
 		"watch": "tsc -watch -p ./",
 		"webpack-dev": "webpack --mode development --watch",

@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-import * as commands from "./commands";
+import { ExtensionContext, commands, window, workspace, languages, TextEditor, TextDocument } from "vscode";
+import * as vCommands from "./commands";
 import { registerFormatter } from "./format";
 import { attachOnCloseTerminalListener } from "./exec";
 import { lint, collection } from "./linter";
@@ -9,23 +9,23 @@ import VDocumentSymbolProvider from "./symbolProvider";
 const vLanguageId = "v";
 
 const cmds = {
-	"v.run": commands.run,
-	"v.ver": commands.ver,
-	"v.help": commands.help,
-	"v.prod": commands.prod,
-	"v.test.file": commands.testFile,
-	"v.playground": commands.playground,
-	"v.test.package": commands.testPackage,
+	"v.run": vCommands.run,
+	"v.ver": vCommands.ver,
+	"v.help": vCommands.help,
+	"v.prod": vCommands.prod,
+	"v.test.file": vCommands.testFile,
+	"v.playground": vCommands.playground,
+	"v.test.package": vCommands.testPackage,
 };
 
 /**
  * This method is called when the extension is activated.
  * @param context The extension context
  */
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
 	for (const cmd in cmds) {
 		const handler = cmds[cmd];
-		const disposable = vscode.commands.registerCommand(cmd, handler);
+		const disposable = commands.registerCommand(cmd, handler);
 		context.subscriptions.push(disposable);
 	}
 
@@ -33,17 +33,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	if (getVConfig().get("enableLinter")) {
 		context.subscriptions.push(
-			vscode.window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors),
-			vscode.workspace.onDidSaveTextDocument(didSaveTextDocument),
-			vscode.workspace.onDidCloseTextDocument(didCloseTextDocument),
-			vscode.languages.registerDocumentSymbolProvider(
-				{ language: vLanguageId },
-				new VDocumentSymbolProvider(context)
-			)
+			window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors),
+			workspace.onDidSaveTextDocument(didSaveTextDocument),
+			workspace.onDidCloseTextDocument(didCloseTextDocument),
+			languages.registerDocumentSymbolProvider({ language: vLanguageId }, new VDocumentSymbolProvider(context))
 		);
+		const activeTextEditor = window.activeTextEditor;
 		// If there are V files open, do the lint immediately
-		if (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.languageId === vLanguageId) {
-			lint(vscode.window.activeTextEditor.document);
+		if (activeTextEditor && activeTextEditor.document.languageId === vLanguageId) {
+			lint(activeTextEditor.document);
 		}
 	}
 }
@@ -51,10 +49,10 @@ export function activate(context: vscode.ExtensionContext) {
 /**
  *  Handles the `onDidChangeVisibleTextEditors` event
  */
-function didChangeVisibleTextEditors(editors: Array<vscode.TextEditor>) {
-	editors.forEach((editor) => {
-		if (editor.document.languageId === vLanguageId) {
-			lint(editor.document);
+function didChangeVisibleTextEditors(editors: Array<TextEditor>) {
+	editors.forEach(({ document }) => {
+		if (document.languageId === vLanguageId) {
+			lint(document);
 		}
 	});
 }
@@ -62,7 +60,7 @@ function didChangeVisibleTextEditors(editors: Array<vscode.TextEditor>) {
 /**
  *  Handles the `onDidSaveTextDocument` event
  */
-function didSaveTextDocument(document: vscode.TextDocument) {
+function didSaveTextDocument(document: TextDocument) {
 	if (document.languageId === vLanguageId) {
 		lint(document);
 	}
@@ -71,9 +69,9 @@ function didSaveTextDocument(document: vscode.TextDocument) {
 /**
  *  Handles the `onDidCloseTextDocument` event
  */
-function didCloseTextDocument(document: vscode.TextDocument) {
+function didCloseTextDocument(document: TextDocument) {
 	if (document.languageId === vLanguageId) {
-		if (!vscode.window.activeTextEditor) collection.clear();
+		if (!window.activeTextEditor) collection.clear();
 		collection.delete(document.uri);
 	}
 }

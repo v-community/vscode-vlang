@@ -31,7 +31,6 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 
 			let symbols: DocumentSymbol[] = [];
 			const documentUriString = document.uri.toString();
-			// const cwd = getCwd(document.uri);
 
 			// Request object for send to `vsymbols`
 			const request: VSymbolInput = {
@@ -41,7 +40,7 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 
 			/** The string version of `request` object */
 			const requestString = JSON.stringify(request);
-			const child = spawn(this.vsymbolsExec, { /* cwd,  */ detached: true });
+			const child = spawn(this.vsymbolsExec, { detached: true });
 
 			// Send/input request string to `vsymbols`
 			child.stdin.write(requestString);
@@ -73,6 +72,7 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 
 				// Got parse error
 				if (response.has_error && symbolsCache.has(documentUriString)) {
+					// Get symbols from cache
 					symbols = symbolsCache.get(documentUriString);
 				} else {
 					for (const symbol of vsymbols) {
@@ -91,7 +91,6 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 							symbols.push(newSymbol);
 						}
 
-						//
 						if (!symbolsCache.has(documentUriString)) {
 							symbolsCache.set(documentUriString, symbols);
 						}

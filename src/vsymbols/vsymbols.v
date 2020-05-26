@@ -55,8 +55,8 @@ fn main() {
 	args := os.args[1..]
 	debug := '-debug' in args
 
-	stdin := os.get_lines_joined()
-	input := json.decode(Input, stdin) or { 
+	lines := os.get_lines_joined()
+	input := json.decode(Input, lines) or {
 		eprintln(invalid_input_message)
 		return
 	}
