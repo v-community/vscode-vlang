@@ -1,0 +1,181 @@
+name: Release
+on:
+  release:
+    types: [created]
+
+jobs:
+  release-ubuntu:
+    runs-on: ubuntu-latest
+    env:
+      VFLAGS: -cc gcc -cg
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "8.x"
+
+      - name: Set release version to env
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+
+      - name: Install V
+        run: |
+          git clone https://github.com/vlang/v.git
+          cd v/
+          make CC=gcc
+          sudo ./v symlink
+
+      - name: Compile VSymbols
+        run: v -prod ./src/vsymbols -o ./bin/vsymbols
+
+      - name: Install vsce
+        run: npm install --global vsce
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create package
+        run: vsce package
+
+      - name: Rename package
+        run: node ./scripts/rename.js
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        if: success()
+        with:
+          path: ./*.vsix
+
+  release-windows:
+    runs-on: windows-2019
+    env:
+      VFLAGS: -cc gcc -cg
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "8.x"
+
+      - name: Set release version to env
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+
+      - name: Install V
+        run: |
+          git clone https://github.com/vlang/v.git d:\v
+          cd d:\v
+          .\make.bat -gcc
+          .\v symlink
+          echo "::add-path::d:\v"
+
+      - name: Verify v is in path
+        run: |
+          pwd
+          v version
+
+      - name: Compile VSymbols
+        run: v -prod ./src/vsymbols -o ./bin/vsymbols
+
+      - name: Install vsce
+        run: npm install --global vsce
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create package
+        run: vsce package
+
+      - name: Rename package
+        run: node ./scripts/rename.js
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        if: success()
+        with:
+          path: ./*.vsix
+
+  release-macos:
+    needs: [release-ubuntu, release-windows]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macOS-latest]
+    env:
+      VFLAGS: -cc gcc -cg
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "8.x"
+
+      - name: Set release version to env
+        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+
+      - name: Install V
+        run: |
+          git clone https://github.com/vlang/v.git
+          cd v/
+          make CC=gcc
+          sudo ./v symlink
+
+      - name: Compile VSymbols
+        run: v -prod ./src/vsymbols -o ./bin/vsymbols
+
+      - name: Install vsce
+        run: npm install --global vsce
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create package
+        run: vsce package
+
+      - name: Rename package
+        run: node ./scripts/rename.js
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Test release
+          draft: true
+          prerelease: true
+
+      - name: Upload Release for linux
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifact/vscode-vlang-${{ env.RELEASE_VERSION }}-linux.vsix
+          asset_name: vscode-vlang-${{ env.RELEASE_VERSION }}-linux.vsix
+          asset_content_type: application/vsix
+
+      - name: Upload Release for windows
+        id: upload-release-asset-windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifact/vscode-vlang-${{ env.RELEASE_VERSION }}-windows.vsix
+          asset_name: vscode-vlang-${{ env.RELEASE_VERSION }}-windows.vsix
+          asset_content_type: application/vsix
+
+      - name: Upload Release for mac os
+        id: upload-release-asset-mac-os
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./vscode-vlang-${{ env.RELEASE_VERSION }}-mac.vsix
+          asset_name: vscode-vlang-${{ env.RELEASE_VERSION }}-mac.vsix
+          asset_content_type: application/vsix
