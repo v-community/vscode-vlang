@@ -9,4 +9,7 @@ images/
 .v
 .go
 tsconfig.json
-minify_json.js
+./scripts/minify_json.js
+./scripts/rename.js
+webpack.config.js
+v
