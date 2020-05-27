@@ -10,30 +10,29 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-            node-version: "8.x"
-      
-      - name: Installing v
+          node-version: "8.x"
+
+      - name: Install v
         run: |
           git clone https://github.com/vlang/v.git
           cd v/
           make CC=gcc
           sudo ./v symlink
-          
+
       - name: Compile VSymbols
         run: v ./src/vsymbols -o ./bin/vsymbols
-          
+
       - name: Install vsce
         run: npm install --global vsce
-        
+
       - name: Install dependencies
         run: npm install
 
-      - name: Webpack
+      - name: Running Webpack
         run: npm run webpack
 
-      - name: Package
-        run: npm run compile-vsymbols && vsce package  && npm run restore-json
-
+      - name: Do Package
+        run: vsce package
 
   build-windows-gcc:
     runs-on: windows-2019
@@ -43,9 +42,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-            node-version: "8.x"
-      
-      - name: Installing V
+          node-version: "8.x"
+
+      - name: Install V
         run: |
           git clone https://github.com/vlang/v.git d:\v
           cd d:\v
@@ -60,15 +59,50 @@ jobs:
 
       - name: Compile VSymbols
         run: v .\src\vsymbols -o .\bin\vsymbols
-          
+
       - name: Install vsce
         run: npm install --global vsce
-        
+
       - name: Install dependencies
         run: npm install
-                
-      - name: Webpack
+
+      - name: Running Webpack
         run: npm run webpack
-        
-      - name: Package
-        run: npm run compile-vsymbols && vsce package  && npm run restore-json
+
+      - name: Do Package
+        run: vsce package
+
+  build-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macOS-latest]
+    env:
+      VFLAGS: -cc gcc -cg
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "8.x"
+
+      - name: Install v
+        run: |
+          git clone https://github.com/vlang/v.git
+          cd v/
+          make CC=gcc
+          sudo ./v symlink
+
+      - name: Compile VSymbols
+        run: v ./src/vsymbols -o ./bin/vsymbols
+
+      - name: Install vsce
+        run: npm install --global vsce
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Running Webpack
+        run: npm run webpack
+
+      - name: Do Package
+        run: vsce package
