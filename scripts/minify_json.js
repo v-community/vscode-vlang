@@ -6,11 +6,7 @@ const { exec } = require("child_process");
 const { writeFileSync } = require("fs");
 const { resolve } = require("path");
 
-const jsonFiles = [
-	"./syntaxes/v.tmLanguage.json",
-	"./language-configuration.json",
-	"./snippets/snippets.json",
-];
+const jsonFiles = ["../syntaxes/v.tmLanguage.json", "../language-configuration.json", "../snippets/snippets.json"];
 
 jsonFiles.forEach((jsonFile) => {
 	const absolutePath = resolve(__dirname, jsonFile);
