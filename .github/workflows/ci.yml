@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: "8.x"
 
-      - name: Install v
+      - name: Install V latest
         run: |
           git clone https://github.com/vlang/v.git
           cd v/
@@ -22,7 +22,7 @@ jobs:
       - name: Compile VSymbols
         run: v ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install vsce
+      - name: Install VSCE
         run: npm install --global vsce
 
       - name: Install dependencies
@@ -31,7 +31,7 @@ jobs:
       - name: Running Webpack
         run: npm run webpack
 
-      - name: Do Package
+      - name: Create package
         run: vsce package
 
   build-windows-gcc:
@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: "8.x"
 
-      - name: Install V
+      - name: Install V latest
         run: |
           git clone https://github.com/vlang/v.git d:\v
           cd d:\v
@@ -52,7 +52,7 @@ jobs:
           .\v symlink
           echo "::add-path::d:\v"
 
-      - name: Verify v is in path
+      - name: Verify V is in path
         run: |
           pwd
           v version
@@ -60,7 +60,7 @@ jobs:
       - name: Compile VSymbols
         run: v .\src\vsymbols -o .\bin\vsymbols
 
-      - name: Install vsce
+      - name: Install VSCE
         run: npm install --global vsce
 
       - name: Install dependencies
@@ -69,7 +69,7 @@ jobs:
       - name: Running Webpack
         run: npm run webpack
 
-      - name: Do Package
+      - name: Create package
         run: vsce package
 
   build-macos:
@@ -85,7 +85,7 @@ jobs:
         with:
           node-version: "8.x"
 
-      - name: Install v
+      - name: Install V latest
         run: |
           git clone https://github.com/vlang/v.git
           cd v/
@@ -95,7 +95,7 @@ jobs:
       - name: Compile VSymbols
         run: v ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install vsce
+      - name: Install VSCE
         run: npm install --global vsce
 
       - name: Install dependencies
@@ -104,5 +104,5 @@ jobs:
       - name: Running Webpack
         run: npm run webpack
 
-      - name: Do Package
+      - name: Create package
         run: vsce package

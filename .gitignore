@@ -6,3 +6,4 @@ out
 input.json
 bin/vsymbols
 test.v
+artifact/

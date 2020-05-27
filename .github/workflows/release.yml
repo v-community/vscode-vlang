@@ -17,7 +17,7 @@ jobs:
       - name: Set release version to env
         run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
 
-      - name: Install V
+      - name: Install V latest
         run: |
           git clone https://github.com/vlang/v.git
           cd v/
@@ -27,11 +27,14 @@ jobs:
       - name: Compile VSymbols
         run: v -prod ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install vsce
+      - name: Install VSCE
         run: npm install --global vsce
 
       - name: Install dependencies
         run: npm install
+
+      - name: NPM version
+        run: npm version ${{ env.RELEASE_VERSION }}
 
       - name: Create package
         run: vsce package
@@ -58,7 +61,7 @@ jobs:
       - name: Set release version to env
         run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
 
-      - name: Install V
+      - name: Install V latest
         run: |
           git clone https://github.com/vlang/v.git d:\v
           cd d:\v
@@ -74,11 +77,14 @@ jobs:
       - name: Compile VSymbols
         run: v -prod ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install vsce
+      - name: Install VSCE
         run: npm install --global vsce
 
       - name: Install dependencies
         run: npm install
+
+      - name: NPM version
+        run: npm version ${{ env.RELEASE_VERSION }}
 
       - name: Create package
         run: vsce package
@@ -109,7 +115,7 @@ jobs:
       - name: Set release version to env
         run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
 
-      - name: Install V
+      - name: Install V latest
         run: |
           git clone https://github.com/vlang/v.git
           cd v/
@@ -119,11 +125,14 @@ jobs:
       - name: Compile VSymbols
         run: v -prod ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install vsce
+      - name: Install VSCE
         run: npm install --global vsce
 
       - name: Install dependencies
         run: npm install
+
+      - name: NPM version
+        run: npm version ${{ env.RELEASE_VERSION }}
 
       - name: Create package
         run: vsce package

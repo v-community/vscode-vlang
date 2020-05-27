@@ -12,4 +12,5 @@ tsconfig.json
 ./scripts/minify_json.js
 ./scripts/rename.js
 webpack.config.js
+artifact/
 v
