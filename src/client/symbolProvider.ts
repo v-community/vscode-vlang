@@ -90,10 +90,7 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 							const newSymbol = new DocumentSymbol(symbol.name, "", symbol.kind, fullRange, revealRange);
 							symbols.push(newSymbol);
 						}
-
-						if (!symbolsCache.has(documentUriString)) {
-							symbolsCache.set(documentUriString, symbols);
-						}
+						symbolsCache.set(documentUriString, symbols);
 					}
 				}
 			});
