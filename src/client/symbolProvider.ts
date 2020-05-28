@@ -76,8 +76,9 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 					symbols = symbolsCache.get(documentUriString);
 				} else {
 					for (const symbol of vsymbols) {
-						const start = new Position(symbol.real_pos.line_nr, symbol.pos.column);
-						const end = new Position(symbol.real_pos.line_nr, symbol.real_pos.len);
+						const start = new Position(symbol.pos.line_nr, 0);
+						const end = new Position(symbol.pos.line_nr, symbol.pos.len);
+						// TODO: Make a real full range
 						const fullRange = new Range(start, end);
 						const revealRange = new Range(fullRange.end, fullRange.end);
 
@@ -95,9 +96,7 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 				}
 			});
 
-			child.on("close", () => {
-				resolve(symbols);
-			});
+			child.on("close", () => resolve(symbols));
 
 			// End the request/input to `vsymbols`
 			child.stdin.end();

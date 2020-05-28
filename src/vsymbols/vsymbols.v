@@ -21,29 +21,20 @@ mut:
 
 struct File {
 mut:
-	temp_path		string
+	temp_path		string	[skip]
 	path			string
 	modname			string
 	symbols			[]SymbolInformation
 	current_idx		int = -1
 	has_error		bool
-	source			string
+	source			string	[skip]
 }
 
 struct SymbolInformation {
 	name		string
-	// signature	string
-	pos			Position
-	real_pos	token.Position
-	body_pos	token.Position
+	pos			token.Position
 	kind		int
 	parent_idx	int = -1
-	// full_range	Range
-}
-
-struct Position {
-	line	int
-	column	int
 }
 
 struct Input {
@@ -131,9 +122,7 @@ fn (mut file File) process_struct(stmt ast.Stmt) {
 	structdecl := stmt as ast.StructDecl
 	file.symbols << SymbolInformation{
 		name: get_real_name(structdecl.name)
-		// signature: structdecl.name
-		pos: file.get_real_position(structdecl.pos)
-		real_pos: structdecl.pos
+		pos: structdecl.pos
 		kind: symbol_kind_struct
 		// parent_idx: file.current_idx
 	}
@@ -142,9 +131,8 @@ if structdecl.fields.len > 0 {
 		for struct_field in structdecl.fields {
 			file.symbols << SymbolInformation {
 				name: get_real_name(struct_field.name)
-				// signature: file.get_signature(struct_field.name)
-				pos: file.get_real_position(struct_field.pos)
-				real_pos: struct_field.pos
+				pos: struct_field.pos
+				// real_pos: struct_field.pos
 				kind: symbol_kind_property
 				parent_idx: parent_idx
 			}
@@ -159,9 +147,7 @@ fn (mut file File) process_const(stmt ast.Stmt) {
 	for const_field in constdecl.fields {
 		file.symbols << SymbolInformation{
 			name: get_real_name(const_field.name)
-			// signature: file.get_signature(const_field.name)
-			pos: file.get_real_position(const_field.pos)
-			real_pos: constdecl.pos
+			pos: const_field.pos
 			kind: symbol_kind_constant
 			// parent_idx: file.current_idx
 		}
@@ -172,10 +158,7 @@ fn (mut file File) process_const(stmt ast.Stmt) {
 fn (mut file File) process_fn(fndecl ast.FnDecl) {
 	file.symbols << SymbolInformation{
 		name: get_real_name(fndecl.name)
-		// signature: fndecl.name
-		pos: file.get_real_position(fndecl.pos)
-		real_pos: fndecl.pos
-		body_pos: fndecl.body_pos
+		pos: fndecl.pos
 		kind: symbol_kind_function
 		// parent_idx: file.current_idx
 	}
@@ -188,10 +171,7 @@ fn (mut file File) process_fn(fndecl ast.FnDecl) {
 fn (mut file File) process_method(fndecl ast.FnDecl) {
 	file.symbols << SymbolInformation{
 		name: fndecl.name
-		// signature: file.get_signature(fndecl.name)
-		pos: file.get_real_position(fndecl.pos)
-		real_pos: fndecl.pos
-		body_pos: fndecl.body_pos
+		pos: fndecl.pos
 		kind: symbol_kind_method
 		// parent_idx: file.current_idx
 	}
@@ -205,9 +185,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 	enumdecl := stmt as ast.EnumDecl
 	file.symbols << SymbolInformation{
 		name: get_real_name(enumdecl.name)
-		// signature: file.get_signature(file.modname)
-		pos: file.get_real_position(enumdecl.pos)
-		real_pos: enumdecl.pos
+		pos: enumdecl.pos
 		kind: symbol_kind_enum
 		// parent_idx: file.current_idx
 	}
@@ -216,9 +194,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 		for enum_field in enumdecl.fields {
 			file.symbols << SymbolInformation{
 				name: enum_field.name
-				// signature: file.get_signature(enumdecl.name)
-				pos: file.get_real_position(enum_field.pos)
-				real_pos: enum_field.pos
+				pos: enum_field.pos
 				kind: symbol_kind_enum_member
 				parent_idx: parent_idx
 			}
@@ -229,23 +205,24 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 fn (file File) get_signature(name string) string {
 	return file.modname + '.' + name
 }
+
 /* ---------------------------------- UTILS --------------------------------- */
-fn (file File) get_real_position(pos token.Position) Position {
-	source := file.source
-	mut p := imax(0, imin(source.len - 1, pos.pos))
-	if source.len > 0 {
-		for ; p >= 0; p-- {
-			if source[p] == `\r` || source[p] == `\n` {
-				break
-			}
-		}
-	}
-	column := imax(0, pos.pos - p - 1)
-	return Position { 
-		line: pos.line_nr + 1
-		column: imax(1, column) - 1 
-	}
-}
+// fn (file File) get_real_position(pos token.Position) Position {
+// 	source := file.source
+// 	mut p := imax(0, imin(source.len - 1, pos.pos))
+// 	if source.len > 0 {
+// 		for ; p >= 0; p-- {
+// 			if source[p] == `\r` || source[p] == `\n` {
+// 				break
+// 			}
+// 		}
+// 	}
+// 	column := imax(0, pos.pos - p - 1)
+// 	return Position { 
+// 		line: pos.line_nr + 1
+// 		column: imax(1, column) - 1 
+// 	}
+// }
 
 fn get_real_name(name string) string {
 	name_split := name.split('.')

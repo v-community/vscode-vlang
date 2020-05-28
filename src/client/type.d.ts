@@ -1,14 +1,8 @@
-import { SymbolKind } from "vscode";
+import { SymbolKind, Range } from "vscode";
 
 export declare interface VSymbolInput {
 	filepath: string;
 	source: string;
-}
-
-declare enum Colors {
-	red,
-	blue,
-	color,
 }
 
 export declare interface VTokenPosition {
@@ -26,10 +20,7 @@ export declare interface VSymbolFile {
 
 export declare interface VSymbolInfo {
 	name: string;
-	// signature: string;
-	pos: { line: number; column: number };
-	real_pos: VTokenPosition;
-	body_pos: VTokenPosition;
+	pos: VTokenPosition;
 	kind: SymbolKind;
 	parent_idx: number;
 }
