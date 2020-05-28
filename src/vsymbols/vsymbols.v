@@ -5,7 +5,6 @@ import v.parser
 import v.ast
 import v.table
 import v.token
-import v.util
 import os
 import json
 import crypto.md5
@@ -28,6 +27,7 @@ mut:
 	symbols			[]SymbolInformation
 	current_idx		int = -1
 	has_error		bool
+	source			string
 }
 
 struct SymbolInformation {
@@ -89,6 +89,7 @@ fn main() {
 		return
 	}
 	ctx.file.process_stmts(parse_result.stmts, -1)
+	ctx.file.source = input.source
 
 	println(json.encode(ctx.file))
 	
@@ -131,7 +132,7 @@ fn (mut file File) process_struct(stmt ast.Stmt) {
 	file.symbols << SymbolInformation{
 		name: get_real_name(structdecl.name)
 		// signature: structdecl.name
-		pos: get_real_position(file.temp_path, structdecl.pos)
+		pos: file.get_real_position(structdecl.pos)
 		real_pos: structdecl.pos
 		kind: symbol_kind_struct
 		// parent_idx: file.current_idx
@@ -142,7 +143,7 @@ if structdecl.fields.len > 0 {
 			file.symbols << SymbolInformation {
 				name: get_real_name(struct_field.name)
 				// signature: file.get_signature(struct_field.name)
-				pos: get_real_position(file.temp_path, struct_field.pos)
+				pos: file.get_real_position(struct_field.pos)
 				real_pos: struct_field.pos
 				kind: symbol_kind_property
 				parent_idx: parent_idx
@@ -159,7 +160,7 @@ fn (mut file File) process_const(stmt ast.Stmt) {
 		file.symbols << SymbolInformation{
 			name: get_real_name(const_field.name)
 			// signature: file.get_signature(const_field.name)
-			pos: get_real_position(file.temp_path, const_field.pos)
+			pos: file.get_real_position(const_field.pos)
 			real_pos: constdecl.pos
 			kind: symbol_kind_constant
 			// parent_idx: file.current_idx
@@ -172,7 +173,7 @@ fn (mut file File) process_fn(fndecl ast.FnDecl) {
 	file.symbols << SymbolInformation{
 		name: get_real_name(fndecl.name)
 		// signature: fndecl.name
-		pos: get_real_position(file.temp_path, fndecl.pos)
+		pos: file.get_real_position(fndecl.pos)
 		real_pos: fndecl.pos
 		body_pos: fndecl.body_pos
 		kind: symbol_kind_function
@@ -188,7 +189,7 @@ fn (mut file File) process_method(fndecl ast.FnDecl) {
 	file.symbols << SymbolInformation{
 		name: fndecl.name
 		// signature: file.get_signature(fndecl.name)
-		pos: get_real_position(file.temp_path, fndecl.pos)
+		pos: file.get_real_position(fndecl.pos)
 		real_pos: fndecl.pos
 		body_pos: fndecl.body_pos
 		kind: symbol_kind_method
@@ -205,7 +206,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 	file.symbols << SymbolInformation{
 		name: get_real_name(enumdecl.name)
 		// signature: file.get_signature(file.modname)
-		pos: get_real_position(file.temp_path, enumdecl.pos)
+		pos: file.get_real_position(enumdecl.pos)
 		real_pos: enumdecl.pos
 		kind: symbol_kind_enum
 		// parent_idx: file.current_idx
@@ -216,7 +217,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 			file.symbols << SymbolInformation{
 				name: enum_field.name
 				// signature: file.get_signature(enumdecl.name)
-				pos: get_real_position(file.temp_path, enum_field.pos)
+				pos: file.get_real_position(enum_field.pos)
 				real_pos: enum_field.pos
 				kind: symbol_kind_enum_member
 				parent_idx: parent_idx
@@ -229,8 +230,8 @@ fn (file File) get_signature(name string) string {
 	return file.modname + '.' + name
 }
 /* ---------------------------------- UTILS --------------------------------- */
-fn get_real_position(filepath string, pos token.Position) Position {
-	source := util.read_file(filepath) or { '' }
+fn (file File) get_real_position(pos token.Position) Position {
+	source := file.source
 	mut p := imax(0, imin(source.len - 1, pos.pos))
 	if source.len > 0 {
 		for ; p >= 0; p-- {
