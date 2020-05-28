@@ -210,7 +210,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 		kind: symbol_kind_enum
 		// parent_idx: file.current_idx
 	}
-	if enumdecl.fields.len > 1 {
+	if enumdecl.fields.len > 0 {
 		parent_idx := file.symbols.filter(symbol_isnt_children).len - 1
 		for enum_field in enumdecl.fields {
 			file.symbols << SymbolInformation{
