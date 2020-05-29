@@ -2,7 +2,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build-ubuntu:
+  ubuntu:
     runs-on: ubuntu-latest
     env:
       VFLAGS: -cc gcc -cg
@@ -34,7 +34,7 @@ jobs:
       - name: Create package
         run: vsce package
 
-  build-windows-gcc:
+  windows-gcc:
     runs-on: windows-2019
     env:
       VFLAGS: -cc gcc -cg
@@ -72,11 +72,8 @@ jobs:
       - name: Create package
         run: vsce package
 
-  build-macos:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macOS-latest]
+  macos:
+    runs-on: macos-latest
     env:
       VFLAGS: -cc gcc -cg
     steps:

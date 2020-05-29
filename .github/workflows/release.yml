@@ -4,7 +4,7 @@ on:
     types: [created]
 
 jobs:
-  release-ubuntu:
+  ubuntu:
     runs-on: ubuntu-latest
     env:
       VFLAGS: -cc gcc -cg
@@ -33,9 +33,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # - name: NPM version
-      #   run: npm version --allow-same-version ${{ env.RELEASE_VERSION }}
-
       - name: Create package
         run: vsce package
 
@@ -48,7 +45,7 @@ jobs:
         with:
           path: ./*.vsix
 
-  release-windows:
+  windows:
     runs-on: windows-2019
     env:
       VFLAGS: -cc gcc -cg
@@ -83,9 +80,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # - name: NPM version
-      #   run: npm version --allow-same-version ${{ env.RELEASE_VERSION }}
-
       - name: Create package
         run: vsce package
 
@@ -98,12 +92,9 @@ jobs:
         with:
           path: ./*.vsix
 
-  release-macos:
-    needs: [release-ubuntu, release-windows]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macOS-latest]
+  macos:
+    needs: [ubuntu, windows]
+    runs-on: macos-latest
     env:
       VFLAGS: -cc gcc -cg
     steps:
@@ -131,9 +122,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # - name: NPM version
-      #   run: npm version --allow-same-version ${{ env.RELEASE_VERSION }}
-
       - name: Create package
         run: vsce package
 
@@ -156,7 +144,7 @@ jobs:
           draft: true
           prerelease: true
 
-      - name: Upload Release for linux
+      - name: Upload vsix build for linux
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
@@ -167,7 +155,7 @@ jobs:
           asset_name: vscode-vlang-${{ env.RELEASE_VERSION }}-linux.vsix
           asset_content_type: application/vsix
 
-      - name: Upload Release for windows
+      - name: Upload vsix build for windows
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
@@ -178,7 +166,7 @@ jobs:
           asset_name: vscode-vlang-${{ env.RELEASE_VERSION }}-windows.vsix
           asset_content_type: application/vsix
 
-      - name: Upload Release for mac os
+      - name: Upload vsix build for mac
         id: upload-release-asset-mac-os
         uses: actions/upload-release-asset@v1
         env:
