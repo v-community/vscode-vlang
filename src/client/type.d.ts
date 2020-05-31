@@ -22,5 +22,5 @@ export declare interface VSymbolInfo {
 	name: string;
 	pos: VTokenPosition;
 	kind: SymbolKind;
-	parent_idx: number;
+	pidx: number;
 }

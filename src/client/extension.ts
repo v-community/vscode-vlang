@@ -29,14 +29,17 @@ export function activate(context: ExtensionContext) {
 		context.subscriptions.push(disposable);
 	}
 
-	context.subscriptions.push(registerFormatter(), attachOnCloseTerminalListener());
+	context.subscriptions.push(
+		registerFormatter(),
+		attachOnCloseTerminalListener(),
+		languages.registerDocumentSymbolProvider({ language: vLanguageId }, new VDocumentSymbolProvider(context))
+	);
 
 	if (getVConfig().get("enableLinter")) {
 		context.subscriptions.push(
 			window.onDidChangeVisibleTextEditors(didChangeVisibleTextEditors),
 			workspace.onDidSaveTextDocument(didSaveTextDocument),
-			workspace.onDidCloseTextDocument(didCloseTextDocument),
-			languages.registerDocumentSymbolProvider({ language: vLanguageId }, new VDocumentSymbolProvider(context))
+			workspace.onDidCloseTextDocument(didCloseTextDocument)
 		);
 		const activeTextEditor = window.activeTextEditor;
 		// If there are V files open, do the lint immediately

@@ -25,7 +25,7 @@ mut:
 	path			string
 	modname			string
 	symbols			[]SymbolInformation
-	current_idx		int = -1
+	cidx			int	[skip] = -1 
 	has_error		bool
 	source			string	[skip]
 }
@@ -34,7 +34,7 @@ struct SymbolInformation {
 	name		string
 	pos			token.Position
 	kind		int
-	parent_idx	int = -1
+	pidx		int = -1
 }
 
 struct Input {
@@ -92,7 +92,7 @@ fn main() {
 	}
 }
 
-fn (mut file File) process_stmts(stmts []ast.Stmt, parent_idx int) {
+fn (mut file File) process_stmts(stmts []ast.Stmt, pidx int) {
 	for stmt in stmts {
 		match stmt {
 			ast.FnDecl {
@@ -124,20 +124,18 @@ fn (mut file File) process_struct(stmt ast.Stmt) {
 		name: get_real_name(structdecl.name)
 		pos: structdecl.pos
 		kind: symbol_kind_struct
-		// parent_idx: file.current_idx
+		// pidx: file.cidx
 	}
 if structdecl.fields.len > 0 {
-		parent_idx := file.symbols.filter(symbol_isnt_children).len - 1
+		pidx := file.symbols.filter(symbol_isnt_children).len - 1
 		for struct_field in structdecl.fields {
 			file.symbols << SymbolInformation {
 				name: get_real_name(struct_field.name)
 				pos: struct_field.pos
-				// real_pos: struct_field.pos
 				kind: symbol_kind_property
-				parent_idx: parent_idx
+				pidx: pidx
 			}
 		}
-
 	}
 }
 
@@ -149,7 +147,7 @@ fn (mut file File) process_const(stmt ast.Stmt) {
 			name: get_real_name(const_field.name)
 			pos: const_field.pos
 			kind: symbol_kind_constant
-			// parent_idx: file.current_idx
+			// pidx: file.cidx
 		}
 	}
 }
@@ -160,7 +158,7 @@ fn (mut file File) process_fn(fndecl ast.FnDecl) {
 		name: get_real_name(fndecl.name)
 		pos: fndecl.pos
 		kind: symbol_kind_function
-		// parent_idx: file.current_idx
+		// pidx: file.cidx
 	}
 	if fndecl.stmts.len > 0 { 
 		file.process_stmts(fndecl.stmts, file.symbols.len)
@@ -173,11 +171,11 @@ fn (mut file File) process_method(fndecl ast.FnDecl) {
 		name: fndecl.name
 		pos: fndecl.pos
 		kind: symbol_kind_method
-		// parent_idx: file.current_idx
+		// pidx: file.cidx
 	}
-	if fndecl.stmts.len > 0 {
-
-	}
+	// if fndecl.stmts.len > 0 {
+	// TODO
+	// }
 }
 
 /* ---------------------------------- ENUM ---------------------------------- */
@@ -187,16 +185,16 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 		name: get_real_name(enumdecl.name)
 		pos: enumdecl.pos
 		kind: symbol_kind_enum
-		// parent_idx: file.current_idx
+		// pidx: file.cidx
 	}
 	if enumdecl.fields.len > 0 {
-		parent_idx := file.symbols.filter(symbol_isnt_children).len - 1
+		pidx := file.symbols.filter(symbol_isnt_children).len - 1
 		for enum_field in enumdecl.fields {
 			file.symbols << SymbolInformation{
 				name: enum_field.name
 				pos: enum_field.pos
 				kind: symbol_kind_enum_member
-				parent_idx: parent_idx
+				pidx: pidx
 			}
 		}
 	}
@@ -241,15 +239,15 @@ fn create_temp_file(filename, content string) string {
 }
 
 fn symbol_isnt_children(symbol SymbolInformation) bool {
-	return symbol.parent_idx == -1
+	return symbol.pidx == -1
 }
 
-[inline]
-fn imin(a, b int) int {
-	return if a < b { a } else { b }
-}
+// [inline]
+// fn imin(a, b int) int {
+// 	return if a < b { a } else { b }
+// }
 
-[inline]
-fn imax(a, b int) int {
-	return if a > b { a } else { b }
-}
+// [inline]
+// fn imax(a, b int) int {
+// 	return if a > b { a } else { b }
+// }

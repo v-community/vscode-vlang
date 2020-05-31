@@ -83,8 +83,8 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 						const revealRange = new Range(fullRange.end, fullRange.end);
 
 						// Current symbol is a children
-						if (symbol.parent_idx > -1) {
-							const parent = symbols[symbol.parent_idx];
+						if (symbol.pidx > -1) {
+							const parent = symbols[symbol.pidx];
 							const child = new DocumentSymbol(symbol.name, "", symbol.kind, fullRange, revealRange);
 							parent.children.push(child);
 						} else {
