@@ -22,9 +22,6 @@ jobs:
       - name: Compile VSymbols
         run: v ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install VSCE
-        run: npm install --global vsce
-
       - name: Install dependencies
         run: npm install
 
@@ -32,7 +29,7 @@ jobs:
         run: npm run webpack
 
       - name: Create package
-        run: vsce package
+        run: npx vsce package
 
   windows-gcc:
     runs-on: windows-2019
@@ -60,9 +57,6 @@ jobs:
       - name: Compile VSymbols
         run: v .\src\vsymbols -o .\bin\vsymbols
 
-      - name: Install VSCE
-        run: npm install --global vsce
-
       - name: Install dependencies
         run: npm install
 
@@ -70,7 +64,7 @@ jobs:
         run: npm run webpack
 
       - name: Create package
-        run: vsce package
+        run: npx vsce package
 
   macos:
     runs-on: macos-latest
@@ -92,9 +86,6 @@ jobs:
       - name: Compile VSymbols
         run: v ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install VSCE
-        run: npm install --global vsce
-
       - name: Install dependencies
         run: npm install
 
@@ -102,4 +93,4 @@ jobs:
         run: npm run webpack
 
       - name: Create package
-        run: vsce package
+        run: npx vsce package

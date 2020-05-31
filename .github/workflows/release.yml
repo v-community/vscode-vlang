@@ -27,14 +27,11 @@ jobs:
       - name: Compile VSymbols
         run: v -prod ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install VSCE
-        run: npm install --global vsce
-
       - name: Install dependencies
         run: npm install
 
       - name: Create package
-        run: vsce package
+        run: npx vsce package
 
       - name: Rename package
         run: node ./scripts/rename.js
@@ -74,14 +71,11 @@ jobs:
       - name: Compile VSymbols
         run: v -prod ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install VSCE
-        run: npm install --global vsce
-
       - name: Install dependencies
         run: npm install
 
       - name: Create package
-        run: vsce package
+        run: npx vsce package
 
       - name: Rename package
         run: node ./scripts/rename.js
@@ -116,14 +110,11 @@ jobs:
       - name: Compile VSymbols
         run: v -prod ./src/vsymbols -o ./bin/vsymbols
 
-      - name: Install VSCE
-        run: npm install --global vsce
-
       - name: Install dependencies
         run: npm install
 
       - name: Create package
-        run: vsce package
+        run: npx vsce package
 
       - name: Rename package
         run: node ./scripts/rename.js
