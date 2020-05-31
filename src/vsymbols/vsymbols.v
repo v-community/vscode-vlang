@@ -75,10 +75,13 @@ fn main() {
 	parse_result := parser.parse_file(filename, table, .skip_comments, prefs, fscope)
 	ctx.file.modname = parse_result.mod.name
 	ctx.file.has_error = parse_result.errors.len > 0
+	
+	// Keep send response even has error
 	if ctx.file.has_error {
 		println(json.encode(ctx.file))
 		return
 	}
+
 	ctx.file.process_stmts(parse_result.stmts, -1)
 	ctx.file.source = input.source
 
@@ -111,6 +114,9 @@ fn (mut file File) process_stmts(stmts []ast.Stmt, pidx int) {
 			}
 			ast.EnumDecl {
 				file.process_enum(stmt)
+			}
+			ast.InterfaceDecl {
+				file.process_interface(stmt)
 			}
 			else {}
 		}
@@ -171,7 +177,7 @@ fn (mut file File) process_method(fndecl ast.FnDecl) {
 		name: fndecl.name
 		pos: fndecl.pos
 		kind: symbol_kind_method
-		// pidx: file.cidx
+		pidx: file.cidx
 	}
 	// if fndecl.stmts.len > 0 {
 	// TODO
@@ -197,6 +203,23 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 				pidx: pidx
 			}
 		}
+	}
+}
+
+/* -------------------------------- INTERFACE ------------------------------- */
+fn (mut file File) process_interface(stmt ast.Stmt) {
+	ifacedecl := stmt as ast.InterfaceDecl
+	file.symbols << SymbolInformation{
+		name: get_real_name(ifacedecl.name)
+		pos: ifacedecl.pos
+		kind: symbol_kind_interface
+	}
+	if ifacedecl.methods.len > 0 {
+		file.cidx = file.symbols.filter(symbol_isnt_children).len - 1
+		for method in ifacedecl.methods {
+			file.process_method(method)
+		}
+		file.cidx = -1
 	}
 }
 
