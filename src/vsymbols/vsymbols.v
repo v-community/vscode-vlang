@@ -118,6 +118,11 @@ fn (mut file File) process_stmts(stmts []ast.Stmt, pidx int) {
 			ast.InterfaceDecl {
 				file.process_interface(stmt)
 			}
+			ast.TypeDecl {
+				if it is ast.AliasTypeDecl {
+					file.process_alias_type(it)
+				}
+			}
 			else {}
 		}
 	}
@@ -180,7 +185,8 @@ fn (mut file File) process_method(fndecl ast.FnDecl) {
 		pidx: file.cidx
 	}
 	// if fndecl.stmts.len > 0 {
-	// TODO
+	// 	pidx := file.symbols.len - 1
+	// 	file.process_stmts(fndecl.stmts, pidx)
 	// }
 }
 
@@ -220,6 +226,16 @@ fn (mut file File) process_interface(stmt ast.Stmt) {
 			file.process_method(method)
 		}
 		file.cidx = -1
+	}
+}
+
+/* ---------------------------------- TYPE ---------------------------------- */
+fn (mut file File) process_alias_type(typedecl ast.TypeDecl) {
+	aliastypedecl := typedecl as ast.AliasTypeDecl
+	file.symbols << SymbolInformation{
+		name: aliastypedecl.name
+		pos: aliastypedecl.pos
+		kind: symbol_kind_field
 	}
 }
 
