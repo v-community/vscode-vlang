@@ -71,24 +71,24 @@ class VDocumentSymbolProvider implements DocumentSymbolProvider {
 				const vsymbols: VSymbolInfo[] = response.symbols;
 
 				// Got parse error
-				if (response.has_error && symbolsCache.has(documentUriString)) {
+				if (response.err && symbolsCache.has(documentUriString)) {
 					// Get symbols from cache
 					symbols = symbolsCache.get(documentUriString);
 				} else {
 					for (const symbol of vsymbols) {
-						const start = new Position(symbol.pos.line_nr, 0);
-						const end = new Position(symbol.pos.line_nr, symbol.pos.len);
+						const start = new Position(symbol.ps.line_nr, 0);
+						const end = new Position(symbol.ps.line_nr, symbol.ps.len);
 						// TODO: Make a real full range
 						const fullRange = new Range(start, end);
 						const revealRange = new Range(fullRange.end, fullRange.end);
 
 						// Current symbol is a children
-						if (symbol.pidx > -1) {
-							const parent = symbols[symbol.pidx];
-							const child = new DocumentSymbol(symbol.name, "", symbol.kind, fullRange, revealRange);
+						if (symbol.px > -1) {
+							const parent = symbols[symbol.px];
+							const child = new DocumentSymbol(symbol.n, "", symbol.k, fullRange, revealRange);
 							parent.children.push(child);
 						} else {
-							const newSymbol = new DocumentSymbol(symbol.name, "", symbol.kind, fullRange, revealRange);
+							const newSymbol = new DocumentSymbol(symbol.n, "", symbol.k, fullRange, revealRange);
 							symbols.push(newSymbol);
 						}
 						symbolsCache.set(documentUriString, symbols);

@@ -1,4 +1,4 @@
-import { SymbolKind, Range } from "vscode";
+import { SymbolKind } from "vscode";
 
 export declare interface VSymbolInput {
 	filepath: string;
@@ -15,12 +15,12 @@ export declare interface VSymbolFile {
 	path: string;
 	modname: string;
 	symbols: VSymbolInfo[];
-	has_error: boolean;
+	err: boolean;
 }
 
 export declare interface VSymbolInfo {
-	name: string;
-	pos: VTokenPosition;
-	kind: SymbolKind;
-	pidx: number;
+	n: string;
+	ps: VTokenPosition;
+	k: SymbolKind;
+	px: number;
 }
