@@ -136,7 +136,7 @@ fn (mut file File) process_struct(stmt ast.Stmt) {
 		ps: structdecl.pos
 		k: .@struct
 		// px: file.cx
-	}	
+	}
 if structdecl.fields.len > 0 {
 		pidx := file.symbols.filter(symbol_isnt_children).len - 1
 		for struct_field in structdecl.fields {
@@ -170,7 +170,7 @@ fn (mut file File) process_fn(fndecl ast.FnDecl) {
 		ps: fndecl.pos
 		k: .function
 		// px: file.cx
-	}	
+	}
 	if fndecl.stmts.len > 0 { 
 		file.process_stmts(fndecl.stmts, file.symbols.len)
 	}
@@ -183,7 +183,7 @@ fn (mut file File) process_method(fndecl ast.FnDecl) {
 		ps: fndecl.pos
 		k: .method
 		px: file.cx
-	}	
+	}
 	// if fndecl.stmts.len > 0 {
 	// 	pidx := file.symbols.len - 1
 	// 	file.process_stmts(fndecl.stmts, pidx)
@@ -198,7 +198,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 		ps: enumdecl.pos
 		k: .@enum
 		// px: file.cx
-	}	
+	}
 	if enumdecl.fields.len > 0 {
 		pidx := file.symbols.filter(symbol_isnt_children).len - 1
 		for enum_field in enumdecl.fields {
