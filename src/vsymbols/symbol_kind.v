@@ -1,38 +1,35 @@
 module main
 
-type SymbolKind int
+enum SymbolKind {
+	file
+	@module
+	namespace
+	package
+	class
+	method
+	property
+	field
+	constructor
+	@enum
+	@interface
+	function
+	variable
+	constant
+	string
+	number
+	boolean
+	array
+	object
+	key
+	null
+	enum_member
+	@struct
+	event
+	operator
+}
 
-const (
-	symbol_kind_file           = 0
-	symbol_kind_module         = 1
-	symbol_kind_namespace      = 2
-	symbol_kind_package        = 3
-	symbol_kind_class          = 4
-	symbol_kind_method         = 5
-	symbol_kind_property       = 6
-	symbol_kind_field          = 7
-	symbol_kind_constructor    = 8
-	symbol_kind_enum           = 9
-	symbol_kind_interface      = 10
-	symbol_kind_function       = 11
-	symbol_kind_variable       = 12
-	symbol_kind_constant       = 13
-	symbol_kind_string         = 14
-	symbol_kind_number         = 15
-	symbol_kind_boolean        = 16
-	symbol_kind_array          = 17
-	symbol_kind_object         = 18
-	symbol_kind_key            = 19
-	symbol_kind_null           = 20
-	symbol_kind_enum_member    = 21
-	symbol_kind_struct         = 22
-	symbol_kind_event          = 23
-	symbol_kind_operator       = 24
-	symbol_kind_type_parameter = 25
-)
-
-fn symbol_kind_str(kind int) string {
-	match kind {
+fn (sk SymbolKind) str() string {
+	match sk {
 		0  { return 'File' }
 		1  { return 'Module' }
 		2  { return 'Namespace' }

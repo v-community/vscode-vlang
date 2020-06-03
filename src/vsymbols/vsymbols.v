@@ -33,7 +33,7 @@ mut:
 struct SymbolInformation {
 	n			string				// name
 	ps			token.Position		// position
-	k			int					// kind - the symbol kind
+	k			SymbolKind			// kind - the symbol kind
 	px			int = -1			// parent index - then index of parrent
 }
 
@@ -89,7 +89,7 @@ fn main() {
 	
 	if debug {
 		for symbol in ctx.file.symbols {
-			println(symbol_kind_str(symbol.k)) 
+			println(symbol.k) 
 			println(symbol)
 		}
 	}
@@ -134,7 +134,7 @@ fn (mut file File) process_struct(stmt ast.Stmt) {
 	file.symbols << SymbolInformation{
 		n: get_real_name(structdecl.name)
 		ps: structdecl.pos
-		k: symbol_kind_struct
+		k: .@struct
 		// px: file.cx
 	}	
 if structdecl.fields.len > 0 {
@@ -143,7 +143,7 @@ if structdecl.fields.len > 0 {
 			file.symbols << SymbolInformation {
 				n: get_real_name(struct_field.name)
 				ps: struct_field.pos
-				k: symbol_kind_property
+				k: .property
 				px: pidx
 			}
 		}
@@ -157,7 +157,7 @@ fn (mut file File) process_const(stmt ast.Stmt) {
 		file.symbols << SymbolInformation{
 			n: get_real_name(const_field.name)
 			ps: const_field.pos
-			k: symbol_kind_constant
+			k: .constant
 			// px: file.cx
 			}
 	}
@@ -168,7 +168,7 @@ fn (mut file File) process_fn(fndecl ast.FnDecl) {
 	file.symbols << SymbolInformation{
 		n: get_real_name(fndecl.name)
 		ps: fndecl.pos
-		k: symbol_kind_function
+		k: .function
 		// px: file.cx
 	}	
 	if fndecl.stmts.len > 0 { 
@@ -181,7 +181,7 @@ fn (mut file File) process_method(fndecl ast.FnDecl) {
 	file.symbols << SymbolInformation{
 		n: fndecl.name
 		ps: fndecl.pos
-		k: symbol_kind_method
+		k: .method
 		px: file.cx
 	}	
 	// if fndecl.stmts.len > 0 {
@@ -196,7 +196,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 	file.symbols << SymbolInformation{
 		n: get_real_name(enumdecl.name)
 		ps: enumdecl.pos
-		k: symbol_kind_enum
+		k: .@enum
 		// px: file.cx
 	}	
 	if enumdecl.fields.len > 0 {
@@ -205,7 +205,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 			file.symbols << SymbolInformation{
 				n: enum_field.name
 				ps: enum_field.pos
-				k: symbol_kind_enum_member
+				k: .enum_member
 				px: pidx
 			}
 		}
@@ -218,7 +218,7 @@ fn (mut file File) process_interface(stmt ast.Stmt) {
 	file.symbols << SymbolInformation{
 		n: get_real_name(ifacedecl.name)
 		ps: ifacedecl.pos
-		k: symbol_kind_interface
+		k: .@interface
 	}
 	if ifacedecl.methods.len > 0 {
 		file.cx = 	file.symbols.filter(symbol_isnt_children).len - 1
@@ -235,7 +235,7 @@ fn (mut file File) process_alias_type(typedecl ast.TypeDecl) {
 	file.symbols << SymbolInformation{
 		n: aliastypedecl.name
 		ps: aliastypedecl.pos
-		k: symbol_kind_field
+		k: .field
 	}
 }
 
