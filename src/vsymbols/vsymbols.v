@@ -137,7 +137,7 @@ fn (mut file File) process_struct(stmt ast.Stmt) {
 		k: .@struct
 		// px: file.cx
 	}
-if structdecl.fields.len > 0 {
+	if structdecl.fields.len > 0 {
 		pidx := file.symbols.filter(symbol_isnt_children).len - 1
 		for struct_field in structdecl.fields {
 			file.symbols << SymbolInformation {
@@ -159,7 +159,7 @@ fn (mut file File) process_const(stmt ast.Stmt) {
 			ps: const_field.pos
 			k: .constant
 			// px: file.cx
-			}
+		}
 	}
 }
 
@@ -172,7 +172,7 @@ fn (mut file File) process_fn(fndecl ast.FnDecl) {
 		// px: file.cx
 	}
 	if fndecl.stmts.len > 0 { 
-		file.process_stmts(fndecl.stmts, file.symbols.len)
+		file.process_stmts(fndecl.stmts, file.symbols.len - 1)
 	}
 }
 
@@ -221,11 +221,11 @@ fn (mut file File) process_interface(stmt ast.Stmt) {
 		k: .@interface
 	}
 	if ifacedecl.methods.len > 0 {
-		file.cx = 	file.symbols.filter(symbol_isnt_children).len - 1
+		file.cx = file.symbols.filter(symbol_isnt_children).len - 1
 		for method in ifacedecl.methods {
 			file.process_method(method)
 		}
-		file.cx = 	-1
+		file.cx = -1
 	}
 }
 
