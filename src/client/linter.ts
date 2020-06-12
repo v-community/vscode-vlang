@@ -7,7 +7,7 @@ import { readdirSync } from "fs";
 
 const outDir = join(tmpdir(), "vscode_vlang", "lint.c");
 const enableGlobalsConfig = getVConfig().get("allowGlobals");
-export const collection = languages.createDiagnosticCollection("V");
+const collection = languages.createDiagnosticCollection("V");
 
 function checkMainFnAndMainModule(text: string) {
 	const checkMainModule = (text: string) => !!text.match(/^\s*(module)+\s+main/);
@@ -79,4 +79,12 @@ export function lint(document: TextDocument): boolean {
 		}
 	});
 	return status;
+}
+
+export function clear() {
+	collection.clear();
+}
+
+export function _delete(uri: Uri) {
+	collection.delete(uri);
 }

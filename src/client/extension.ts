@@ -2,7 +2,7 @@ import { ExtensionContext, commands, window, workspace, languages, TextEditor, T
 import * as vCommands from "./commands";
 import { registerFormatter } from "./format";
 import { attachOnCloseTerminalListener } from "./exec";
-import { lint, collection } from "./linter";
+import * as linter from "./linter";
 import { clearTempFolder, getVConfig } from "./utils";
 import VDocumentSymbolProvider from "./symbolProvider";
 
@@ -44,7 +44,7 @@ export function activate(context: ExtensionContext) {
 		const activeTextEditor = window.activeTextEditor;
 		// If there are V files open, do the lint immediately
 		if (activeTextEditor && activeTextEditor.document.languageId === vLanguageId) {
-			lint(activeTextEditor.document);
+			linter.lint(activeTextEditor.document);
 		}
 	}
 }
@@ -55,7 +55,7 @@ export function activate(context: ExtensionContext) {
 function didChangeVisibleTextEditors(editors: Array<TextEditor>) {
 	editors.forEach(({ document }) => {
 		if (document.languageId === vLanguageId) {
-			lint(document);
+			linter.lint(document);
 		}
 	});
 }
@@ -65,7 +65,7 @@ function didChangeVisibleTextEditors(editors: Array<TextEditor>) {
  */
 function didSaveTextDocument(document: TextDocument) {
 	if (document.languageId === vLanguageId) {
-		lint(document);
+		linter.lint(document);
 	}
 }
 
@@ -73,9 +73,11 @@ function didSaveTextDocument(document: TextDocument) {
  *  Handles the `onDidCloseTextDocument` event
  */
 function didCloseTextDocument(document: TextDocument) {
+	if (!window.visibleTextEditors.length) {
+		linter.clear();
+	}
 	if (document.languageId === vLanguageId) {
-		if (!window.activeTextEditor) collection.clear();
-		collection.delete(document.uri);
+		linter._delete(document.uri);
 	}
 }
 
