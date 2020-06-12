@@ -1,20 +1,13 @@
-import {
-	TextDocument,
-	Range,
-	DiagnosticSeverity,
-	Diagnostic,
-	languages,
-	Uri,
-	workspace,
-} from "vscode";
+import { TextDocument, Range, DiagnosticSeverity, Diagnostic, languages, Uri, workspace } from "vscode";
 import { tmpdir } from "os";
 import { sep } from "path";
-import { trimBoth, getWorkspaceFolder } from "./utils";
+import { trimBoth, getWorkspaceFolder, getVConfig } from "./utils";
 import { execV } from "./exec";
 import { resolve, relative, dirname } from "path";
 import { readdirSync } from "fs";
 
 const outDir = `${tmpdir()}${sep}vscode_vlang${sep}`;
+const enableGlobalsConfig = getVConfig().get("allowGlobals");
 export const collection = languages.createDiagnosticCollection("V");
 
 function checkMainFnAndMainModule(text: string) {
@@ -50,7 +43,9 @@ export function lint(document: TextDocument): boolean {
 	target = haveMultipleMainFn ? relative(cwd, document.fileName) : target;
 	let status = true;
 
-	execV([shared, "-o", `${outDir}lint.c`, target], (err, stdout, stderr) => {
+	const globals = enableGlobalsConfig ? "--enable-globals" : "";
+
+	execV([globals, shared, "-o", `${outDir}lint.c`, target], (err, stdout, stderr) => {
 		collection.clear();
 		if (err || stderr.trim().length > 1) {
 			const output = stderr || stdout;
