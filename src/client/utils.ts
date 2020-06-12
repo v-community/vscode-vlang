@@ -10,9 +10,9 @@ import {
 } from "vscode";
 import { existsSync, mkdirSync, readdir, unlink } from "fs";
 import { tmpdir } from "os";
-import { sep, join } from "path";
+import { join } from "path";
 
-const TEMP_DIR = `${tmpdir()}${sep}vscode_vlang`;
+const TEMP_DIR = join(tmpdir(), "vscode_vlang");
 const defaultCommand = "v";
 
 /** Get full range of the document. */
@@ -48,9 +48,7 @@ export function getCwd(uri?: Uri): string {
 export function getWorkspaceFolder(uri?: Uri): WorkspaceFolder {
 	if (uri) return workspace.getWorkspaceFolder(uri);
 	const currentDoc = getCurrentDocument();
-	return currentDoc
-		? workspace.getWorkspaceFolder(currentDoc.uri)
-		: workspace.workspaceFolders[0];
+	return currentDoc ? workspace.getWorkspaceFolder(currentDoc.uri) : workspace.workspaceFolders[0];
 }
 
 export function getCurrentDocument(): TextDocument {
@@ -78,5 +76,5 @@ export function clearTempFolder() {
 }
 
 export function getExtensionPath() {
-	return extensions.getExtension("0x9ef.vscode-vlang").extensionPath
+	return extensions.getExtension("0x9ef.vscode-vlang").extensionPath;
 }
