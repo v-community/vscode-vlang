@@ -62,6 +62,7 @@ fn main() {
 	fscope := ast.Scope{ parent: 0 }
 	prefs := pref.Preferences{
 		skip_warnings: true
+		enable_globals: true
 	}
 	table := table.new_table()
 
