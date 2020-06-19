@@ -100,24 +100,23 @@ fn (mut file File) process_stmts(stmts []ast.Stmt, pidx int) {
 	for stmt in stmts {
 		match stmt {
 			ast.FnDecl {
-				fndecl := stmt as ast.FnDecl
-				if fndecl.is_method {
-					file.process_method(fndecl)
+				if it.is_method {
+					file.process_method(it)
 				} else {
-					file.process_fn(fndecl)
+					file.process_fn(it)
 				}
 			}
 			ast.StructDecl { 
-				file.process_struct(stmt) 
+				file.process_struct(it) 
 			}
 			ast.ConstDecl { 
-				file.process_const(stmt) 
+				file.process_const(it) 
 			}
 			ast.EnumDecl {
-				file.process_enum(stmt)
+				file.process_enum(it)
 			}
 			ast.InterfaceDecl {
-				file.process_interface(stmt)
+				file.process_interface(it)
 			}
 			ast.TypeDecl {
 				if it is ast.AliasTypeDecl {
@@ -130,8 +129,7 @@ fn (mut file File) process_stmts(stmts []ast.Stmt, pidx int) {
 }
 
 /* --------------------------------- STRUCT --------------------------------- */
-fn (mut file File) process_struct(stmt ast.Stmt) {
-	structdecl := stmt as ast.StructDecl
+fn (mut file File) process_struct(structdecl ast.StructDecl) {
 	file.symbols << SymbolInformation{
 		n: get_real_name(structdecl.name)
 		ps: structdecl.pos
@@ -152,8 +150,7 @@ fn (mut file File) process_struct(stmt ast.Stmt) {
 }
 
 /* --------------------------------- CONST --------------------------------- */
-fn (mut file File) process_const(stmt ast.Stmt) {
-	constdecl := stmt as ast.ConstDecl
+fn (mut file File) process_const(constdecl ast.ConstDecl) {
 	for const_field in constdecl.fields {
 		file.symbols << SymbolInformation{
 			n: get_real_name(const_field.name)
@@ -192,8 +189,7 @@ fn (mut file File) process_method(fndecl ast.FnDecl) {
 }
 
 /* ---------------------------------- ENUM ---------------------------------- */
-fn (mut file File) process_enum(stmt ast.Stmt) {
-	enumdecl := stmt as ast.EnumDecl
+fn (mut file File) process_enum(enumdecl ast.EnumDecl) {
 	file.symbols << SymbolInformation{
 		n: get_real_name(enumdecl.name)
 		ps: enumdecl.pos
@@ -214,8 +210,7 @@ fn (mut file File) process_enum(stmt ast.Stmt) {
 }
 
 /* -------------------------------- INTERFACE ------------------------------- */
-fn (mut file File) process_interface(stmt ast.Stmt) {
-	ifacedecl := stmt as ast.InterfaceDecl
+fn (mut file File) process_interface(ifacedecl ast.InterfaceDecl) {
 	file.symbols << SymbolInformation{
 		n: get_real_name(ifacedecl.name)
 		ps: ifacedecl.pos
