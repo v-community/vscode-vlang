@@ -11,6 +11,8 @@ import {
 import { existsSync, mkdirSync, readdir, unlink } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
+import { execFileSync } from "child_process";
+import { platform } from "os";
 
 const TEMP_DIR = join(tmpdir(), "vscode_vlang");
 const defaultCommand = "v";
@@ -74,7 +76,16 @@ export function clearTempFolder() {
 		}
 	});
 }
-
 export function getExtensionPath() {
 	return extensions.getExtension("0x9ef.vscode-vlang").extensionPath;
+}
+
+export function openUrl(url: string) {
+	const os = platform();
+	const open = {
+		win32: "start",
+		linux: "xdg-open",
+		darwin: "open",
+	};
+	execFileSync(open[os], [url]);
 }
